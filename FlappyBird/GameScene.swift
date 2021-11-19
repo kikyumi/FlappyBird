@@ -13,7 +13,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var wallNode:SKNode!
     var bird: SKSpriteNode!
     var itemNode: SKNode!
-    let playItemSound = SKAction.playSoundFileNamed("getItem.mp3", waitForCompletion: true)
+    
+    //アイテム取得音の音源ファイルを指定
+    let playItemSound = Bundle.main.bundleURL.appendingPathComponent("getItem.mp3")
+    //AVAudioPlayerのインスタンス宣言
+    var soundPlayer: AVAudioPlayer!
     
     // 衝突判定カテゴリー
     let birdCategory: UInt32 = 1 << 0       // 0...00001
@@ -337,7 +341,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     //リスタートするメソッドを作成
-    func restart(){
+    func restart() {
         score = 0
         scoreLabelNode.text = "Score:\(score)"
         itemScore = 0
@@ -358,7 +362,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             bird.physicsBody?.velocity = CGVector.zero
             // 鳥に縦方向の力を与える
             bird.physicsBody?.applyImpulse(CGVector(dx: 0, dy: 15))
-        }else if scrollNode.speed == 0{
+        } else if scrollNode.speed == 0{
             restart()
         }
     }
@@ -390,7 +394,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             itemScore += 1
             itemScoreLabelNode.text = "Item Score:\(itemScore)"
             //■■■■■音を鳴らす■■■■■■
-            self.run(playItemSound)
+            //サウンドプレイヤーに、音源ファイル名を指定
+            soundPlayer = try! AVAudioPlayer(contentsOf: playItemSound, fileTypeHint: nil)
+            soundPlayer!.play()
    
             //■■■■■獲得したアイテムを消す■■■■■
             contact.bodyB.node?.removeFromParent()
