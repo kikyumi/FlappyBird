@@ -297,6 +297,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         
         // 物理演算を設定
         bird.physicsBody = SKPhysicsBody(circleOfRadius: bird.size.height / 2)
+        // 衝突した時に回転させない
+        bird.physicsBody?.allowsRotation = false
         // 衝突のカテゴリー設定
         bird.physicsBody?.categoryBitMask = birdCategory
         bird.physicsBody?.collisionBitMask = wallCategory | groundCategory
@@ -382,8 +384,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             scoreLabelNode.text = "Score:\(score)"
             // ベストスコア更新か確認する
             var bestScore = userDefaults.integer(forKey: "BEST")
-            if score > bestScore {
-                bestScore = score
+            let totalScore = score + itemScore
+            if totalScore > bestScore {
+                bestScore = totalScore
+                bestScoreLabelNode.text = "Best Score:\(bestScore)"
                 userDefaults.set(bestScore, forKey: "BEST")
                 userDefaults.synchronize()
                 }
@@ -397,7 +401,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             //サウンドプレイヤーに、音源ファイル名を指定
             soundPlayer = try! AVAudioPlayer(contentsOf: playItemSound, fileTypeHint: nil)
             soundPlayer!.play()
-   
+
             //■■■■■獲得したアイテムを消す■■■■■
             contact.bodyB.node?.removeFromParent()
             
@@ -406,6 +410,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             let totalScore = score + itemScore
             if totalScore > bestScore {
                 bestScore = totalScore
+                bestScoreLabelNode.text = "Best Score:\(bestScore)"
                 userDefaults.set(bestScore, forKey: "BEST")
                 userDefaults.synchronize()
                 }
